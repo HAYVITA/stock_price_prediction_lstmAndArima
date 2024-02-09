@@ -5,6 +5,12 @@ Developed a stock price prediction model using both LSTM and ARIMA
 
 Here's a live deployment - https://stock-price-prediction-qi60.onrender.com/
 
+Google Colab links:
+https://colab.research.google.com/drive/1bQz8bspUvBmiyxw-XO5TcIwooKHQGV6l
+https://colab.research.google.com/drive/1B5CDL4VrCfXj_rzhHxib9WnPNgAwN8Xk
+https://colab.research.google.com/drive/1_i3Z8BO1dtIXysDBf-Cx3HAEKy75fQao
+https://colab.research.google.com/drive/1GkbrE_VEshZWl-0JHJM9GNfDU65BpZxv
+
 <center>
     <img src='img/snap_1.png' alt='image' width='90%' name='snap_1'/>
 </center>
