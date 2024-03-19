@@ -7,7 +7,15 @@
 	padding: 10px;
 	margin-top: 5%;
 }
-
+#centering {
+	width: 80%;
+	text-align:justify;
+	padding: 30px;
+	margin:auto;
+	border-left:40em;
+	color:#201658;
+	background-color:#BED1CF	;
+}
 form {
 	margin: auto;
 	padding: 20px;
