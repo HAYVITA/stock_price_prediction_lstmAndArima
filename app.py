@@ -1,55 +1,37 @@
-import streamlit as st
+from flask import Flask,render_template,request
+import numpy as np
 import pandas as pd
 import pickle
+from statsmodels.tsa.arima.model import ARIMA
+import json
+import plotly
+import plotly.express as px
 import plotly.graph_objects as go
-from statsmodels.tsa.arima.model import ARIMAResults
 
-# Load data
-@st.cache
-def load_data(file_path):
-    data = pd.read_csv(file_path, parse_dates=True)
-    return data
+app = Flask(__name__)
 
-# Load ARIMA model
-@st.cache(allow_output_mutation=True)
-def load_arima_model(model_path):
-    model = pickle.load(open(model_path, 'rb'))
-    return model
+@app.route('/')
+@app.route('/index')
 
-# Function to predict using ARIMA model
-def predict_arima(model, data, days):
-    pred = model.predict(start=len(data), end=len(data)+days, typ='levels')
-    return pred
+def index():
+	return render_template('index.html')
 
-def main():
-    st.title('Stock Price Prediction with ARIMA')
-
-    # Upload file and select model
-    uploaded_file = st.file_uploader("Upload CSV file", type=['csv'])
-    if uploaded_file is not None:
-        data = load_data(uploaded_file)
-        st.write('Uploaded data:')
-        st.write(data.head())
-
-        model_path = 'model_pickle_apple_arima.sav'  # Update with your model path
-        model = load_arima_model(model_path)
-
-        days = st.number_input('Enter number of days to predict:', min_value=1, value=7)
-
-        if st.button('Predict'):
-            pred = predict_arima(model, data[' Close/Last'], days)
-            
-            # Plotting historical data
-            fig1 = go.Figure([go.Scatter(x=data['Date'], y=data[' Close/Last'])])
-            st.plotly_chart(fig1, use_container_width=True)
-
-            # Plotting predicted values
-            x = [i for i in range(1, days+2)]
-            fig2 = go.Figure([go.Scatter(x=x, y=pred)])
-            st.plotly_chart(fig2, use_container_width=True)
-
-            st.write('Predicted Values:')
-            st.write(pred)
+@app.route('/predict', methods = ['POST'])
+def predict():
+	if request.method == 'POST':
+		days = request.form["data"]
+		days = int(days) - 1
+		data = pd.read_csv('HistoricalQuotes.csv', parse_dates = True)
+		data = data[::-1]
+		model = pickle.load(open('model_pickle_apple_arima.sav', 'rb'))
+		pred = model.predict(start = len(data), end = len(data)+days, typ = 'levels')
+		x = [i for i in range(1, days+2)]
+		fig1 = go.Figure([go.Scatter(x=data['Date'], y=data[' Close/Last'])])
+		fig2 = go.Figure([go.Scatter(x=x, y=pred)]) 
+		graphJSON1 = json.dumps(fig1, cls=plotly.utils.PlotlyJSONEncoder)
+		graphJSON2 = json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
+		return render_template('index.html', b = pred, graphJSON1=graphJSON1, graphJSON2=graphJSON2)
 
 if __name__ == '__main__':
-    main()
+	app.debug = True
+	app.run(host = "0.0.0.0", port = 5000)
